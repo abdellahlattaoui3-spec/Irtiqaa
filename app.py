@@ -1,145 +1,194 @@
-import streamlit as st
-import time
-from datetime import datetime
-
-# 1. إعدادات الصفحة والتصميم الملكي الاحترافي
-st.set_page_config(page_title="إرتقِ - IRTIQA", layout="wide", initial_sidebar_state="collapsed")
-
-# تصميم CSS مخصص لإبهار العين
-st.markdown("""
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق ارتقي - Ertaqi</title>
     <style>
-    /* الخلفية الملكية المتدرجة */
-    .main { 
-        background: linear-gradient(180deg, #000000 0%, #1a0033 50%, #000000 100%);
-        color: #d4af37;
-        font-family: 'Amiri', serif;
-    }
-    /* الأزرار الذهبية الملكية */
-    .stButton>button {
-        background: linear-gradient(45deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-        color: black !important;
-        border: none;
-        border-radius: 15px;
-        padding: 15px;
-        font-weight: bold;
-        font-size: 18px;
-        width: 100%;
-        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
-        cursor: pointer;
-    }
-    /* تصميم بطاقات الأقسام */
-    .section-card {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid #d4af37;
-        padding: 25px;
-        border-radius: 20px;
-        margin-bottom: 20px;
-        direction: rtl;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    h1, h2, h3 { color: #d4af37 !important; text-align: center; text-shadow: 2px 2px 4px #000; }
-    .stCheckbox { color: #d4af37 !important; direction: rtl; font-size: 22px; }
+        /* تعريف المتغيرات لتغيير الألوان بسهولة */
+        :root {
+            --primary-gold: #D4AF37;
+            --main-bg: #1A1A1A;
+            --text-color: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1542810634-71277d95dcbb?q=80&w=2070') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* خانة تغيير الثيم (المتطرفة) */
+        .theme-switcher {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--primary-gold);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            margin-top: 50px;
+            flex-grow: 1;
+        }
+
+        /* زر المحاسبة الرئيسي */
+        .main-btn {
+            background: var(--primary-gold);
+            color: black;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+            transition: 0.3s;
+            margin-bottom: 30px;
+        }
+
+        /* قسم المحاسبة (مخفي في البداية) */
+        #accounting-section {
+            display: none;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--primary-gold);
+            margin-bottom: 50px;
+        }
+
+        .category-btn {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-color);
+            border: 1px solid var(--primary-gold);
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            text-align: right;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .sub-tasks {
+            display: none;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 0.5px solid rgba(212, 175, 55, 0.2);
+        }
+
+        /* التذييل الفخم */
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+            background: rgba(0,0,0,0.7);
+            border-top: 2px solid var(--primary-gold);
+        }
+
+        .dua { font-size: 18px; color: white; }
+        .signature { 
+            color: var(--primary-gold); 
+            font-weight: bold; 
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
     </style>
-    """, unsafe_allow_html=True)
+</head>
+<body>
 
-# 2. الهوية البصرية والدعاء المخصص
-st.markdown("<h1>🌟 إرتقِ - IRTIQA</h1>", unsafe_allow_html=True)
-st.markdown("""
-    <div style='text-align: center; border: 2px solid #d4af37; padding: 20px; border-radius: 15px; background: rgba(212, 175, 55, 0.15); margin-bottom: 30px;'>
-        <h2 style='margin: 0; color: #fdfc97;'>اللهم اغفر لي ولوالديّ وللمؤمنين والمؤمنات</h2>
-        <p style='color: #d4af37; font-size: 1.5em; margin-top: 10px;'>بإشراف: عبد الله</p>
+    <!-- تغيير الثيم -->
+    <div class="theme-switcher">
+        <label>لون الخط: </label>
+        <input type="color" id="textColorPicker" value="#ffffff" onchange="updateColors()">
+        <br>
+        <label>الثيم العام: </label>
+        <input type="color" id="themeColorPicker" value="#D4AF37" onchange="updateColors()">
     </div>
-    """, unsafe_allow_html=True)
 
-# 3. إدارة الجلسة (السجل والمسبحة)
-if 'total_tasbih' not in st.session_state: st.session_state.total_tasbih = 0
-if 'history_log' not in st.session_state: st.session_state.history_log = []
-
-# 4. التنقل بين النوافذ الخمس الرئيسية
-choice = st.selectbox("إختر الوجهة:", ["📊 محاسبة النفس", "📿 المسبحة والذكر", "☀️ الأذكار التفاعلية", "📖 القرآن الكريم", "🕋 مواقيت الصلاة"])
-
-st.write("---")
-
-# --- النافذة 1: محاسبة النفس (النظام الذي طلبته بدقة) ---
-if choice == "📊 محاسبة النفس":
-    st.header("📋 سجل محاسبة النفس")
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("🌙 العبادات والنمو")
-        q1 = st.checkbox("قيام الليل")
-        q2 = st.checkbox("البر بالوالدين")
-        q3 = st.checkbox("حفظ القرآن الكريم")
-        q4 = st.checkbox("طلب العلم الخاص")
-        q5 = st.checkbox("صلوات النوافل (الرواتب)")
+    <div class="container">
+        <h1 style="color: var(--primary-gold); font-size: 45px;">ارتقي</h1>
         
-    with col2:
-        st.subheader("🕌 صلوات الجماعة")
-        s1 = st.checkbox("صلاة الفجر في جماعة")
-        s2 = st.checkbox("صلاة الظهر في جماعة")
-        s3 = st.checkbox("صلاة العصر في جماعة")
-        s4 = st.checkbox("صلاة المغرب في جماعة")
-        s5 = st.checkbox("صلاة العشاء في جماعة")
+        <button class="main-btn" onclick="toggleSection('accounting-section')">خانة المحاسبة</button>
 
-    if st.button("💾 حفظ في سجلك الخاص"):
-        entry = {"date": str(datetime.now().strftime("%Y-%m-%d %H:%M")), "status": "تم الإنجاز"}
-        st.session_state.history_log.append(entry)
-        st.success("تم الحفظ تلقائياً في سجلك. يمكنك العودة لرؤية ما فاتك!")
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# --- النافذة 2: المسبحة الذكية (نظام الـ 10,000) ---
-elif choice == "📿 المسبحة والذكر":
-    st.header("المسبحة الملكية الذكية")
-    
-    # مكافأة الوصول لـ 10,000 تسبيحة
-    if st.session_state.total_tasbih >= 10000:
-        st.balloons()
-        st.markdown("<div style='text-align: center; color: #00ff00; font-size: 30px; animation: pulse 1s infinite;'>🎉 هنيئاً لك! لقد حققت هدف الـ 10,000 تسبيحة اليوم</div>", unsafe_allow_html=True)
-
-    col_m1, col_m2, col_m3 = st.columns([1,2,1])
-    with col_m2:
-        st.markdown(f"""
-            <div style='text-align: center; border: 10px double #d4af37; border-radius: 50%; padding: 60px; background: rgba(0,0,0,0.6); box-shadow: 0 0 20px #d4af37;'>
-                <span style='font-size: 80px; font-weight: bold;'>{st.session_state.total_tasbih}</span><br>
-                <span style='font-size: 25px;'>ذكر</span>
+        <!-- قسم المحاسبة المليء بالتفاصيل -->
+        <div id="accounting-section">
+            
+            <!-- الصلوات المفروضة -->
+            <button class="category-btn" onclick="toggleSection('prayer-tasks')">➕ الصلوات الخمس (جماعة)</button>
+            <div id="prayer-tasks" class="sub-tasks">
+                <div class="task-item"><span>الفجر</span> <input type="checkbox"></div>
+                <div class="task-item"><span>الظهر</span> <input type="checkbox"></div>
+                <div class="task-item"><span>العصر</span> <input type="checkbox"></div>
+                <div class="task-item"><span>المغرب</span> <input type="checkbox"></div>
+                <div class="task-item"><span>العشاء</span> <input type="checkbox"></div>
             </div>
-            """, unsafe_allow_html=True)
-        
-        st.write("<br>", unsafe_allow_html=True)
-        if st.button("اضغط للتسبيح (سبحان الله وبحمده)"):
-            st.session_state.total_tasbih += 1
-            st.rerun()
-        
-        if st.button("تصفير العداد"):
-            st.session_state.total_tasbih = 0
-            st.rerun()
 
-# --- النافذة 3: الأذكار التفاعلية (صباح ومساء) ---
-elif choice == "☀️ الأذكار التفاعلية":
-    st.header("أذكار الصباح والمساء")
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.info("نظام الأذكار الذكي: عند ضغطك على إتمام الذكر، سيتم توجيهك تلقائياً للذكر التالي.")
-    if st.button("بدء أذكار الصباح ☀️"):
-        st.write("الذكر الأول: آية الكرسي...")
-    if st.button("بدء أذكار المساء 🌙"):
-        st.write("الذكر الأول: أمسينا وأمسى الملك لله...")
-    st.markdown("</div>", unsafe_allow_html=True)
+            <!-- النوافل مقسمة -->
+            <button class="category-btn" onclick="toggleSection('nafila-tasks')">➕ صلوات النوافل</button>
+            <div id="nafila-tasks" class="sub-tasks">
+                <div class="task-item"><span>السنن الرواتب</span> <input type="checkbox"></div>
+                <div class="task-item"><span>صلاة الضحى</span> <input type="checkbox"></div>
+                <div class="task-item"><span>صلاة الوتر</span> <input type="checkbox"></div>
+            </div>
 
-# --- النافذة 4: القرآن الكريم ---
-elif choice == "📖 القرآن الكريم":
-    st.header("المصحف الشريف")
-    st.markdown("<div class='section-card' style='text-align: center;'>", unsafe_allow_html=True)
-    st.write("هنا قسم تلاوة وحفظ القرآن الكريم.")
-    st.markdown("</div>", unsafe_allow_html=True)
+            <!-- المهام الأخرى -->
+            <button class="category-btn">🌙 قيام الليل</button>
+            <button class="category-btn">📖 حفظ القرآن</button>
+            <button class="category-btn">📚 الورد اليومي</button>
+            <button class="category-btn">🎓 العلم الخاص (تسيير واقتصاد)</button>
+            <button class="category-btn">❤️ بر الوالدين</button>
+            <button class="category-btn">📿 أذكار الصباح والمساء</button>
 
-# --- النافذة 5: أوقات الصلاة والمنبه ---
-elif choice == "🕋 مواقيت الصلاة":
-    st.header("مواقيت الصلاة - الجزائر")
-    st.markdown("<div class='section-card'>", unsafe_allow_html=True)
-    st.write("📍 المدينة: الجزائر العاصمة وما جاورها")
-    st.button("🔔 تفعيل منبه الأذان (بصوت واحد)")
-    st.markdown("</div>", unsafe_allow_html=True)
+        </div>
+    </div>
 
-# التذييل النهائي
-st.markdown("<br><hr><center><p style='opacity: 0.6;'>IRTIQA - تم التطوير والبرمجة خصيصاً لعبد الله - 2026</p></center>", unsafe_allow_html=True)
+    <!-- التذييل كما طلبت يا عبد الله -->
+    <footer>
+        <div class="dua">اللهم اغفر لي ولوالديَّ</div>
+        <div class="signature">BY ABDELLAH</div>
+    </footer>
+
+    <script>
+        // وظيفة لإظهار وإخفاء الأقسام
+        function toggleSection(id) {
+            const el = document.getElementById(id);
+            el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // وظيفة تغيير الثيم (العفسة التفاعلية)
+        function updateColors() {
+            const textColor = document.getElementById('textColorPicker').value;
+            const themeColor = document.getElementById('themeColorPicker').value;
+            
+            document.documentElement.style.setProperty('--text-color', textColor);
+            document.documentElement.style.setProperty('--primary-gold', themeColor);
+        }
+    </script>
+</body>
+</html>
